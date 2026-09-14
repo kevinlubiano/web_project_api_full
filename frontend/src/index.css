@@ -1,0 +1,25 @@
+@import url("./vendor/normalize.css");
+@import url("./vendor/fonts.css");
+
+@import url("./blocks/page.css");
+@import url("./blocks/content.css");
+@import url("./blocks/profile.css");
+@import url("./blocks/cards.css");
+
+@import url("./components/Header/Header.css");
+@import url("./components/Footer/Footer.css");
+@import url("./components/Main/components/Card/Card.css");
+@import url("./components/Main/components/Popup/Popup.css");
+@import url("./components/InfoTooltip/InfoTooltip.css");
+
+html,
+body {
+  background-color: #000;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
