@@ -1,4 +1,4 @@
-const baseUrl = "https://se-register-api.en.tripleten-services.com/v1";
+const baseUrl = "http://localhost:3000";
 
 function checkResponse(res) {
   if (res.ok) {

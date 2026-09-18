@@ -1,98 +1,81 @@
-const Card = require('../models/card');
+const Card = require("../models/card");
+const NotFoundError = require("../errors/NotFoundError");
+const BadRequestError = require("../errors/BadRequestError");
+const ForbiddenError = require("../errors/ForbiddenError");
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID inválido' });
-      }
-
-      return res.status(500).send({ message: 'Error del servidor' });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Datos inválidos' });
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Datos inválidos"));
       }
 
-      return res.status(500).send({ message: 'Error del servidor' });
+      return next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .orFail(() => {
-      const error = new Error('Tarjeta no encontrada');
-      error.statusCode = 404;
-      throw error;
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
+    .orFail(() => new NotFoundError("Tarjeta no encontrada"))
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError(
+          "No tienes permiso para eliminar esta tarjeta",
+        );
+      }
+
+      return Card.findByIdAndDelete(req.params.cardId).then(() =>
+        res.send({ message: "Tarjeta eliminada correctamente" }),
+      );
     })
-    .then(() => res.send({ message: 'Tarjeta eliminada correctamente' }))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("ID inválido"));
       }
 
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID inválido' });
-      }
-
-      return res.status(500).send({ message: 'Error del servidor' });
+      return next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      const error = new Error('Tarjeta no encontrada');
-      error.statusCode = 404;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Tarjeta no encontrada"))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("ID inválido"));
       }
 
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID inválido' });
-      }
-
-      return res.status(500).send({ message: 'Error del servidor' });
+      return next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      const error = new Error('Tarjeta no encontrada');
-      error.statusCode = 404;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Tarjeta no encontrada"))
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("ID inválido"));
       }
 
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID inválido' });
-      }
-
-      return res.status(500).send({ message: 'Error del servidor' });
+      return next(err);
     });
 };

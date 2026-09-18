@@ -1,7 +1,13 @@
 class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
-    this._headers = options.headers;
+  }
+
+  _getHeaders() {
+    return {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${localStorage.getItem("jwt")}`,
+    };
   }
 
   _checkResponse(res) {
@@ -14,20 +20,20 @@ class Api {
 
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers,
+      headers: this._getHeaders(),
     }).then((res) => this._checkResponse(res));
   }
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers,
+      headers: this._getHeaders(),
     }).then((res) => this._checkResponse(res));
   }
 
   editProfile(data) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name: data.name,
         about: data.about,
@@ -38,7 +44,7 @@ class Api {
   addCard({ name, link }) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      headers: this._headers,
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name,
         link,
@@ -49,21 +55,21 @@ class Api {
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: this._getHeaders(),
     }).then((res) => this._checkResponse(res));
   }
 
   addLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
-      headers: this._headers,
+      headers: this._getHeaders(),
     }).then((res) => this._checkResponse(res));
   }
 
   removeLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: this._getHeaders(),
     }).then((res) => this._checkResponse(res));
   }
 
@@ -74,7 +80,7 @@ class Api {
   updateAvatar(avatar) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: this._getHeaders(),
       body: JSON.stringify({
         avatar,
       }),
@@ -83,9 +89,5 @@ class Api {
 }
 
 export const api = new Api({
-  baseUrl: "https://around-api.es.tripleten-services.com/v1",
-  headers: {
-    authorization: "b50bec3f-6c7d-41ed-a9e8-f01acd58e989",
-    "Content-Type": "application/json",
-  },
+  baseUrl: "http://localhost:3000",
 });
