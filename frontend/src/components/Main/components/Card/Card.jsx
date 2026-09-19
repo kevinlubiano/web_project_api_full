@@ -6,7 +6,7 @@ export default function Card(props) {
   const { card, handleOpenPopup, onCardLike, onCardDelete } = props;
   const { name, link } = card;
 
-  const currentUser = useContext(CurrentUserContext);
+  const { currentUser } = useContext(CurrentUserContext);
 
   const isLiked = (card.likes || []).some(
     (like) => like._id === currentUser?._id,
