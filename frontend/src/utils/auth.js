@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:3000";
+const baseUrl = "https://around-kevin-api.duckdns.org";
 
 function checkResponse(res) {
   if (res.ok) {

@@ -7,7 +7,7 @@ const UnauthorizedError = require("../errors/UnauthorizedError");
 const ConflictError = require("../errors/ConflictError");
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = "dev-secret-key";
+const { JWT_SECRET = "dev-secret-key" } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})
